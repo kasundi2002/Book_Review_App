@@ -1,113 +1,116 @@
 import React, { useState, useEffect } from 'react';
-import './CustomerHome.css';
+import '../css/CustomerHomePage.css';
+import { Link } from 'react-router-dom';
 
 const CustomerHomePage = () => {
-  const [books, setBooks] = useState([]);
-  const [error, setError] = useState(null);
+  const [books, setBooks] = useState(null); // Null for loading state
+  const [error, setError] = useState(false);
+  const [userName, setUserName] = useState(''); // State to store user name
 
-  // Fetch books data from backend when the component mounts
   useEffect(() => {
+    // Fetching user profile
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem('token'); // Use localStorage for web
+        if (token) {
+          const response = await fetch('http://localhost:5000/api/admin/residents/me', {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await response.json();
+          setUserName(data.userName); // Set the user's name
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  useEffect(() => {
+    // Fetching book data
     const fetchBooks = async () => {
       try {
-        const response = await fetch('http://localhost:8081/book/getAll'); // replace with your backend API URL
+        const response = await fetch('http://localhost:8081/book/getAll');
+
         if (!response.ok) {
-          throw new Error('Failed to fetch books');
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+
         const data = await response.json();
-        setBooks(data);
+
+        if (Array.isArray(data) && data.length > 0) {
+          setBooks(data);
+          setError(false);
+        } else {
+          setBooks([]); // No books found
+        }
       } catch (err) {
-        setError(err.message);
+        console.error('Error fetching books:', err);
+        setError(true);
+        setBooks(null);
       }
     };
 
     fetchBooks();
   }, []);
 
-  const handleViewDetails = (bookId) => {
-    // Logic for viewing book details (e.g., navigate to another page or open a modal)
-    alert(`Viewing details for book ID: ${bookId}`);
+  // Function to convert buffer data to Base64 string
+  const convertBufferToBase64 = (bufferData) => {
+    return btoa(
+      new Uint8Array(bufferData).reduce((data, byte) => data + String.fromCharCode(byte), '')
+    );
   };
 
-  const handleSubmitReview = (bookId, rating, comment) => {
-    // Logic for submitting the review (e.g., send it to the backend)
-    alert(`Review submitted for book ID: ${bookId}\nRating: ${rating}\nComment: ${comment}`);
-  };
+  if (books === null && !error) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error fetching books. Please try again later.</div>;
+  }
+
+  if (books.length === 0) {
+    return <div>No books found.</div>;
+  }
 
   return (
-    <div className="wrapper">
-      <div className="container">
-        <div className="title">
-          <h1>Best Selling Books</h1>
-        </div>
+    <div className="product-grid">
+      {books.map((book) => {
+        let bookCoverSrc = 'https://via.placeholder.com/150'; // Fallback image
 
-        {error && <p>{error}</p>}
+        // Handle cover image if present
+        if (book.coverImage && book.coverImage.data) {
+          const base64String = convertBufferToBase64(book.coverImage.data.data);
+          bookCoverSrc = `data:${book.coverImage.contentType};base64,${base64String}`;
+        }
 
-        <div className="product">
-          <div className="product-container">
-            {books.map((book) => (
-              <div className="product-item" key={book.id}>
-                <div className="product-img">
-                  <img src={`${book.image}`} alt={book.title} />
-                  <button
-                    type="button"
-                    className="add-btn"
-                    onClick={() => handleViewDetails(book.id)}
-                  >
-                    View Details
-                  </button>
-                </div>
-
-                <div className="product-content">
-                  <a href="/viewBook" className="book-title">{book.title}</a>
-                  <p className="author">by <span>{book.author}</span></p>
-                  <div>
-                    <ul className="rating">
-                      {[...Array(5)].map((_, index) => (
-                        <li key={index}>
-                          <i
-                            className={`fas fa-star ${index < Math.floor(book.rating) ? '' : 'empty-star'}`}
-                          ></i>
-                        </li>
-                      ))}
-                      {/* Ensure reviews is an array before accessing its length */}
-                      <li>({Array.isArray(book.reviews) ? book.reviews.length : 0} review{book.reviews && book.reviews.length !== 1 ? 's' : ''})</li>
-                    </ul>
-                    <span className="price">${book.price}</span>
-                  </div>
-                </div>
-
-                {/* Rating & Review Form */}
-                <div className="review-section">
-                  <div className="rating-stars">
-                    <span>Rate this book:</span>
-                    {[...Array(5)].map((_, index) => (
-                      <label key={index}>
-                        <input type="radio" name={`rating-${book.id}`} value={index + 1} />
-                        <i className={`fas fa-star ${index < 4 ? '' : 'empty-star'}`}></i>
-                      </label>
-                    ))}
-                  </div>
-                  <textarea placeholder="Write a review..." id={`review-comment-${book.id}`} />
-                  <button
-                    className="submit-review-btn"
-                    onClick={() => {
-                      const comment = document.getElementById(`review-comment-${book.id}`).value;
-                      const rating = document.querySelector(`input[name="rating-${book.id}"]:checked`)?.value;
-                      if (rating && comment) {
-                        handleSubmitReview(book.id, rating, comment);
-                      } else {
-                        alert('Please provide a rating and review comment');
-                      }
-                    }}
-                  >
-                    Submit Review
-                  </button>
-                </div>
-              </div>
-            ))}
+        return (
+          <div key={book._id} className="product-card">
+            <img
+              src={bookCoverSrc}
+              alt={book.title || 'Book Cover'}
+              onError={(e) => {
+                e.target.src = 'https://via.placeholder.com/150'; // Fallback image
+              }}
+            />
+            <h4>{book.title || 'Untitled Book'}</h4>
+            <p>Author: {book.author || 'Unknown Author'}</p>
+            <p>Genre: {book.genre || 'Unknown Genre'}</p>
+            <br />
+            <Link
+              to={`/books/${book._id}`}
+              style={{ textDecoration: 'none', color: 'inherit' }}
+              className="view-item-btn"
+            >
+              View Book
+            </Link>
           </div>
-        </div>
-      </div>
+        );
+      })}
     </div>
   );
 };

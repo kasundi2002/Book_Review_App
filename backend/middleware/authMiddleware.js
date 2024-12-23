@@ -1,21 +1,32 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 
-// Middleware to protect routes
-const authenticateToken = async (req, res, next) => {
-    const token = req.headers['authorization']?.split(' ')[1];
+const authenticateUser = async (req, res, next) => {
+  const token = req.header('Authorization');
 
-    if (!token) {
-        return res.status(401).json({ message: 'Access denied. No token provided.' });
+  if (!token) {
+    return res.status(401).json({ message: 'Access denied, token missing' });
+  }
+
+  // Remove the 'Bearer ' prefix if it's there
+  const tokenWithoutBearer = token.replace('Bearer ', '');
+
+  try {
+    const decoded = jwt.verify(tokenWithoutBearer, process.env.JWT_SECRET);
+
+    // Find the user by ID stored in the token
+    const user = await User.findById(decoded.id);
+    
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
     }
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify the token
-        req.user = await User.findById(decoded.id).select('-password'); // Attach user to request
-        next();
-    } catch (error) {
-        res.status(401).json({ message: 'Invalid token.' });
-    }
+    // Attach the user info to the request
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(400).json({ message: 'Invalid token' });
+  }
 };
 
-module.exports = { authenticateToken };
+module.exports = authenticateUser;

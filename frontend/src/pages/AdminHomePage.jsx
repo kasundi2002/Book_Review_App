@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 const AdminHomePage = () => {
     const [books, setBooks] = useState([]);
     const [showAddForm, setShowAddForm] = useState(false);
+    
+
     const [newBook, setNewBook] = useState({
         title: '',
         author: '',
@@ -148,11 +150,13 @@ const AdminHomePage = () => {
     };
 
     // Pagination Logic
-    const totalPages = Math.ceil(books.length / itemsPerPage);
-    const currentBooks = books.slice(
+    const totalPages = Math.ceil((books?.length || 0) / itemsPerPage);
+
+    const currentBooks = (books || []).slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
+
 
     const handlePageChange = (page) => {
         if (page >= 1 && page <= totalPages) {

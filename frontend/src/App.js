@@ -21,8 +21,9 @@ function App() {
         <Route path="/adminHome" element={<AdminHomePage />} />
 
         {/* customer route */}
+        <Route path="/books/:id" element={<SingleBookPage />} />
         <Route path="/customerHome" element={<CustomerHomePage />} />
-        <Route path="/book/:id" element={<SingleBookPage />} />
+        {/* <Route path="/book/:id" element={<SingleBookPage />} /> */}
       </Routes>
     </Router>
   );

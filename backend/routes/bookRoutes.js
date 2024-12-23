@@ -9,7 +9,7 @@ const router = express.Router();
 // http://localhost:8081/book/getAll
 router.get('/getAll', getAllBooks); // Get all books
 
-// http://localhost:8081/book/getOnebook/:id
+// http://localhost:8081/book/getOnebook/${id}
 router.get('/getOnebook/:id', getBookById); // Get a specific book by ID
 
 // http://localhost:8081/book/addBook

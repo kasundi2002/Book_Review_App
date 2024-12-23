@@ -1,52 +1,130 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import './SingleBookPage.css'; // Link the CSS file
+import '../css/SingleBookPage.css';
 
 const SingleBookPage = () => {
-    const { id } = useParams(); // Get the book ID from the URL
-    const [book, setBook] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const { id } = useParams();
+  const [book, setBook] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [rating, setRating] = useState(5);
+  const [reviewAuthor, setReviewAuthor] = useState('');
+  const [reviewText, setReviewText] = useState('');
 
-    useEffect(() => {
-        // Fetch book details from the backend
-        fetch(`http://localhost:8081/book/getOneBook/${id}`)
-            .then((response) => response.json())
-            .then((data) => {
-                setBook(data);
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error('Error fetching book details:', error);
-                setLoading(false);
-            });
-    }, [id]);
+  useEffect(() => {
+    const fetchBookById = async () => {
+      try {
+        const response = await fetch(`http://localhost:8081/book/getOnebook/${id}`);
+        if (!response.ok) throw new Error('Failed to fetch book by ID');
+        const data = await response.json();
+        if (data?._id) {
+          setBook(data);
+          setReviews(data.reviews || []);
+        } else {
+          setBook(null);
+        }
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBookById();
+  }, [id]);
 
-    if (loading) {
-        return <div className="loading">Loading book details...</div>;
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!reviewAuthor.trim() || !reviewText.trim() || rating < 1 || rating > 5) {
+      alert('Please provide valid input.');
+      return;
     }
-
-    if (!book) {
-        return <div className="error">Book not found.</div>;
+    try {
+      const reviewData = { bookId: id, rating, reviewText };
+      const response = await fetch('http://localhost:8081/addRatingReview/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reviewData),
+      });
+      if (!response.ok) throw new Error('Failed to submit review');
+      const savedReview = await response.json();
+      setReviews((prevReviews) => [...prevReviews, savedReview]);
+      setRating(5);
+      setReviewAuthor('');
+      setReviewText('');
+    } catch (error) {
+      console.error('Error posting review:', error);
     }
+  };
 
-    return (
-        <div className="book-details">
-            <h1>{book.title}</h1>
-            <h2>Author: {book.author}</h2>
-            <p><strong>Genre:</strong> {book.genre}</p>
-            <p><strong>Publication Year:</strong> {book.publicationYear}</p>
-            <p className="description"><strong>Description:</strong> {book.summary}</p>
-            <p className="ratings"><strong>Average Rating:</strong> {book.averageRating}</p>
-            <p className="reviews"><strong>Review:</strong> {book.summary}</p>
-            <button
-                className="go-back-button"
-                onClick={() => window.history.back()}
-            >
-                Go Back
-            </button>
+  if (loading) return <h2>Loading book data...</h2>;
+  if (error) return <h2 style={{ color: 'red' }}>Error: {error}</h2>;
+  if (!book) return <h2>No book found with ID: {id}</h2>;
+
+  const bookCoverSrc = book.coverImage?.data && book.coverImage?.contentType
+    ? `data:${book.coverImage.contentType};base64,${book.coverImage.data}`
+    : 'fallback_image_url_here';
+
+  console.log(book.coverImage);
+
+  return (
+    <div>
+      <div className="item-detail-container">
+        <img src={book.coverImage} alt={book.title} className="item-image" />
+        <div className="item-details">
+          <h2>{book.title}</h2>
+          <p><strong>Author:</strong> {book.author}</p>
+          <p><strong>Genre:</strong> {book.genre}</p>
+          <p><strong>Summary:</strong> {book.summary}</p>
+          <p><strong>Rating:</strong> {book.averageRating || 'N/A'} / 5</p>
         </div>
-    );
+      </div>
+      <div className="review-section">
+        <h1>Reviews</h1>
+        {reviews.length > 0 ? (
+          reviews.map((review) => (
+            <div key={review._id} className="review-item">
+              <p><strong>{review.author || 'Anonymous'}</strong> — {review.rating}/5</p>
+              <p>{review.text}</p>
+            </div>
+          ))
+        ) : (
+          <p>No reviews yet.</p>
+        )}
+        <h1>Add a Review</h1>
+        <form onSubmit={handleReviewSubmit} className="review-form">
+          <label>
+            Name:
+            <input
+              type="text"
+              placeholder="Your name"
+              value={reviewAuthor}
+              onChange={(e) => setReviewAuthor(e.target.value)}
+            />
+          </label>
+          <label>
+            Rating (1-5):
+            <input
+              type="number"
+              min="1"
+              max="5"
+              value={rating}
+              onChange={(e) => setRating(Number(e.target.value))}
+            />
+          </label>
+          <label>
+            Review:
+            <textarea
+              placeholder="Write your review..."
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+            />
+          </label>
+          <button type="submit">Submit Review</button>
+        </form>
+      </div>
+    </div>
+  );
 };
 
 export default SingleBookPage;
-

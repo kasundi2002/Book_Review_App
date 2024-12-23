@@ -1,5 +1,5 @@
-const RatingReviews = require('./models/ratingReviewsModel');
-const Book = require('./models/bookModel');
+const RatingReviews = require('./../models/ratingReviewsModel');
+const Book = require('./../models/bookModel');
 
 // Function to calculate and update the average rating for a book
 const calculateAndUpdateAverageRating = async (bookId) => {

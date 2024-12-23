@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const ratingReviewModel = new mongoose.Schema({
+const ratingReviewsModel = new mongoose.Schema({
     bookId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Book',
@@ -28,4 +28,4 @@ const ratingReviewModel = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model('RatingReviews', ratingReviewModel);
+module.exports = mongoose.model('RatingReviews', ratingReviewsModel);
