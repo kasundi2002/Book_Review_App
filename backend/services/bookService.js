@@ -1,3 +1,4 @@
+const mongoose = require('mongoose'); // Import mongoose
 const RatingReviews = require('./../models/ratingReviewsModel');
 const Book = require('./../models/bookModel');
 
@@ -7,7 +8,7 @@ const calculateAndUpdateAverageRating = async (bookId) => {
         // Step 1: Aggregate ratings for the specified book
         const result = await RatingReviews.aggregate([
             {
-                $match: { bookId: mongoose.Types.ObjectId(bookId) }, // Match reviews for the specific book
+                $match: { bookId: new mongoose.Types.ObjectId(bookId) }, // Use 'new' keyword
             },
             {
                 $group: {

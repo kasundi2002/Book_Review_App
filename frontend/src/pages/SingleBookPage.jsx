@@ -132,7 +132,7 @@ const SingleBookPage = () => {
         {reviews.length > 0 ? (
           reviews.map((review) => (
             <div key={review._id} className="review-item">
-              <p><strong>{review.author || 'Anonymous'}</strong> — {review.rating}/5</p>
+              <p><strong>{review.author || 'Anonymous'}</strong> — {review.reviewText}</p>
               <p>{review.text}</p>
             </div>
           ))

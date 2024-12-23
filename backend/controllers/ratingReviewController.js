@@ -5,16 +5,26 @@ const calculateAndUpdateAverageRating = require('./../services/bookService');
 
 const addRatingReview = async (req, res) => {
     try {
-        console.log(`Inside addRatingReview controller:${bookId},${userId},${rating},${reviewText}`)
+        console.log('Request Body:', req.body);
+
         const { bookId, userId, rating, reviewText } = req.body;
 
-        // Add a new rating
+        console.log(`Inside addRatingReview controller: ${bookId}, ${userId}, ${rating}, ${reviewText}`);
+        
+        // Add a new rating and review
         const newRating = await RatingReviews.create({
             bookId,
             userId,
             rating,
             reviewText,
         });
+
+        // Update the RatingsAndReviews array in the book model
+        await Book.findByIdAndUpdate(
+            bookId,
+            { $push: { RatingsAndReviews: newRating._id } },
+            { new: true }
+        );
 
         // Recalculate the average rating
         const averageRating = await calculateAndUpdateAverageRating(bookId);
@@ -25,10 +35,11 @@ const addRatingReview = async (req, res) => {
             averageRating,
         });
     } catch (error) {
+        console.error('Error adding rating:', error);
         res.status(500).json({ message: 'Error adding rating', error });
     }
-
 };
+
 
 // Get all reviews for a specific book
 const getReviewsByBook = async (req, res) => {
