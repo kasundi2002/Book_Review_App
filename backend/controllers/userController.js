@@ -93,10 +93,37 @@ const createUser = async (req, res) => {
 // Get a single user
 const getUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    res.json(user);
+    // Extract token from the Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'No token provided or invalid format' });
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Fetch the user details from the database
+    const user = await User.findById(decoded.id).select('-password'); // Exclude the password field
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Respond with user details
+    res.status(200).json(user); // Send the entire user object
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Error fetching user details:', error);
+
+    // Handle specific JWT errors
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Token expired' });
+    }
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+
+    res.status(500).json({ message: 'Server error' });
   }
 };
 

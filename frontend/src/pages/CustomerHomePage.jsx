@@ -1,26 +1,30 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import '../css/CustomerHomePage.css';
 import { Link } from 'react-router-dom';
 
 const CustomerHomePage = () => {
+  const { id } = useParams();
   const [books, setBooks] = useState(null); // Null for loading state
   const [error, setError] = useState(false);
   const [userName, setUserName] = useState(''); // State to store user name
-
+  const [userId, setUserId] = useState('');
+  
   useEffect(() => {
     // Fetching user profile
     const fetchUserProfile = async () => {
       try {
         const token = localStorage.getItem('token'); // Use localStorage for web
         if (token) {
-          const response = await fetch('http://localhost:5000/api/admin/residents/me', {
+          const response = await fetch(`http://localhost:8081/users/getUser`, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
           const data = await response.json();
-          setUserName(data.userName); // Set the user's name
+          setUserName(data.name); // Set the user's name
+          setUserId(data._id);
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);

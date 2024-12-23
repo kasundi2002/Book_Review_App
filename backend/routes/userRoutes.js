@@ -11,8 +11,8 @@ router.post('/login',loginUser )
 router.post('/createUser', createUser);
 
 // Get user details by ID
-// http://localhost:8081/users/getUser/${id}
-router.get('/getUser/:id', getUser);
+// http://localhost:8081/users/getUser
+router.get('/getUser', getUser);
 
 // Update an existing user by ID
 //http://localhost:8081/users/updateUser/${id}

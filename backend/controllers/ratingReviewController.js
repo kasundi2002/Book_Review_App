@@ -5,6 +5,7 @@ const calculateAndUpdateAverageRating = require('./../services/bookService');
 
 const addRatingReview = async (req, res) => {
     try {
+        console.log(`Inside addRatingReview controller:${bookId},${userId},${rating},${reviewText}`)
         const { bookId, userId, rating, reviewText } = req.body;
 
         // Add a new rating

@@ -9,23 +9,24 @@ const SingleBookPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [rating, setRating] = useState(5);
-  const [reviewAuthor, setReviewAuthor] = useState('');
   const [reviewText, setReviewText] = useState('');
   const [userName, setUserName] = useState('');
   const [userId, setUserId] = useState('');
-    useEffect(() => {
+    
+  useEffect(() => {
       // Fetching user profile
       const fetchUserProfile = async () => {
         try {
           const token = localStorage.getItem('token'); // Use localStorage for web
           if (token) {
-            const response = await fetch(`http://localhost:8081/users/getUser/${id}`, {
+            const response = await fetch(`http://localhost:8081/users/getUser`, {
               method: 'GET',
               headers: {
                 Authorization: `Bearer ${token}`,
               },
             });
             const data = await response.json();
+            console.log(`Inside single book ratings : ${data}`)
             setUserName(data.userName); // Set the user's name
             setUserId(data._id);
           }
@@ -35,7 +36,7 @@ const SingleBookPage = () => {
       };
   
       fetchUserProfile();
-    }, [id]);
+    }, []);
 
   useEffect(() => {
     const fetchBookById = async () => {
@@ -60,6 +61,7 @@ const SingleBookPage = () => {
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
+    console.log(`Inside handleReview`);
 
     if (!reviewText.trim() || rating < 1 || rating > 5) {
       alert('Please provide valid input.');
@@ -67,25 +69,23 @@ const SingleBookPage = () => {
     }
 
     try {
-      const token = localStorage.getItem('token'); // Get token from localStorage
-      if (!token) {
-        alert('Please log in to submit a review.');
-        return;
-      }
-
+      
       const reviewData = {
         bookId: id,
         userId: userId,
         rating: rating,
         reviewText: reviewText,
       };
+      console.log(`userId:${userId} , bookId:${id} , rating:${rating} , reviewText:${reviewText}`);
 
+      console.log(reviewData);
+      const token = localStorage.getItem('token');
       // Sending the review data to the backend
       const response = await fetch('http://localhost:8081/ratingReviews/addRatingReview', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Authorization: `Bearer ${token}`,  // Pass token in the Authorization header
+           Authorization: `Bearer ${token}`,  // Pass token in the Authorization header
         },
         body: JSON.stringify(reviewData),
       });
@@ -115,8 +115,6 @@ const SingleBookPage = () => {
     ? `data:${book.coverImage.contentType};base64,${book.coverImage.data}`
     : 'fallback_image_url_here';
 
-  console.log(book.coverImage);
-
   return (
     <div>
       <div className="item-detail-container">
@@ -142,10 +140,10 @@ const SingleBookPage = () => {
           <p>No reviews yet.</p>
         )}
         <h1>Add a Review</h1>
-        <form onSubmit={handleReviewSubmit} className="review-form">
-          <label>
+        <form className="review-form">
+          {/* <label>
             Name:${userName}
-          </label>
+          </label> */}
           <label>
             Rating (1-5):
             <input
@@ -164,7 +162,7 @@ const SingleBookPage = () => {
               onChange={(e) => setReviewText(e.target.value)}
             />
           </label>
-          <button type="submit">Submit Review</button>
+          <button type="button"  onClick={handleReviewSubmit}>Submit Review</button>
         </form>
       </div>
     </div>
