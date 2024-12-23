@@ -1,4 +1,3 @@
-// AdminHomePage.js
 import React, { useEffect, useState } from 'react';
 import './AdminHomePage.css';
 
@@ -12,31 +11,31 @@ const AdminHomePage = () => {
         summary: '',
         coverImage: null,
     });
+    const [selectedBook, setSelectedBook] = useState(null);
+    const [isEdit, setIsEdit] = useState(false); // To toggle between View/Edit modes
 
     // Fetch books from the API
     useEffect(() => {
-const fetchBooks = async () => {
-        try {
-            console.log('inside fetch books');
-            const response = await fetch('http://localhost:8081/book/getAll'); // Adjust the API URL as needed
+        const fetchBooks = async () => {
+            try {
+                console.log('Fetching books...');
+                const response = await fetch('http://localhost:8081/book/getAll'); // Adjust the API URL as needed
+                if (!response.ok) {
+                    throw new Error('Failed to fetch books');
+                }
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch books');
+                const data = await response.json();
+
+                if (data && data.length > 0) {
+                    setBooks(data);
+                } else {
+                    setBooks(null); // No books found
+                }
+            } catch (error) {
+                console.error('Error fetching books:', error);
+                setBooks(null);  // Set to null on error
             }
-
-            const data = await response.json();
-
-            // Check if books data is null or empty
-            if (data && data.length > 0) {
-                setBooks(data);
-            } else {
-                setBooks(null); // Or set an empty array if you prefer
-            }
-        } catch (error) {
-            console.error('Error fetching books:', error);
-            setBooks(null);  // Set to null or empty array on error
-        }
-    };
+        };
 
         fetchBooks();
     }, []);
@@ -50,7 +49,7 @@ const fetchBooks = async () => {
             await fetch(`http://localhost:8081/book/deleteBook/${id}`, {
                 method: 'DELETE',
             });
-            setBooks(books.filter((book) => book._id !== id));
+            setBooks(books.filter((book) => book._id !== id)); // Remove the deleted book from the list
         } catch (error) {
             console.error('Error deleting book:', error);
         }
@@ -68,43 +67,80 @@ const fetchBooks = async () => {
 
     // Handle Add Book Form Submission
     const handleAddBookSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('title', newBook.title);
-    formData.append('author', newBook.author);
-    formData.append('genre', newBook.genre);
-    formData.append('summary', newBook.summary);
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('title', newBook.title);
+        formData.append('author', newBook.author);
+        formData.append('genre', newBook.genre);
+        formData.append('summary', newBook.summary);
 
-    if (newBook.coverImage && newBook.coverImage instanceof File) {
-        formData.append('coverImage', newBook.coverImage);
-    }
-
-    try {
-        const response = await fetch('http://localhost:8081/book/addBook', {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error: ${response.statusText}`);
+        if (newBook.coverImage && newBook.coverImage instanceof File) {
+            formData.append('coverImage', newBook.coverImage);
         }
 
-        const data = await response.json();
+        try {
+            const response = await fetch('http://localhost:8081/book/addBook', {
+                method: 'POST',
+                body: formData,
+            });
 
-        // Ensure books is an array before setting the new state
-        setBooks((prevBooks) => {
-            if (Array.isArray(prevBooks)) {
-                return [...prevBooks, data];
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
             }
-            return [data];  // If prevBooks is not an array, start a new array with the added book
-        });
 
-        setShowAddForm(false);
-        setNewBook({ title: '', author: '', genre: '', summary: '', coverImage: null });
-    } catch (error) {
-        console.error('Error adding book:', error);
-    }
-};
+            const data = await response.json();
+
+            // Ensure books is an array before setting the new state
+            setBooks((prevBooks) => {
+                if (Array.isArray(prevBooks)) {
+                    return [...prevBooks, data];
+                }
+                return [data];  // If prevBooks is not an array, start a new array with the added book
+            });
+
+            setShowAddForm(false);
+            setNewBook({ title: '', author: '', genre: '', summary: '', coverImage: null });
+        } catch (error) {
+            console.error('Error adding book:', error);
+        }
+    };
+
+    // Open the modal to view or edit the book
+    const handleBookSelect = (book, edit = false) => {
+        setSelectedBook(book);
+        setIsEdit(edit);
+    };
+
+    // Handle the form submit for editing the selected book
+    const handleEditSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('title', selectedBook.title);
+        formData.append('author', selectedBook.author);
+        formData.append('genre', selectedBook.genre);
+        formData.append('summary', selectedBook.summary);
+
+        if (selectedBook.coverImage && selectedBook.coverImage instanceof File) {
+            formData.append('coverImage', selectedBook.coverImage);
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8081/book/updateBook/${selectedBook._id}`, {
+                method: 'PUT',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update book');
+            }
+
+            const updatedBook = await response.json();
+            setBooks(books.map((book) => (book._id === updatedBook._id ? updatedBook : book)));
+            setSelectedBook(null); // Close modal
+        } catch (error) {
+            console.error('Error updating book:', error);
+        }
+    };
 
     return (
         <div className="admin-home">
@@ -150,46 +186,48 @@ const fetchBooks = async () => {
                     <button type="submit" className="btn save">Save Book</button>
                 </form>
             )}
+
             {/* Display "No books" if books data is empty or null */}
             {books === null || books.length === 0 ? (
                 <p>No books available</p>
-            ) :
-            <table className="admin-table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>Genre</th>
-                        <th>Average Rating</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {books.map((book) => (
-                        <tr key={book._id}>
-                            <td>{book.title}</td>
-                            <td>{book.author}</td>
-                            <td>{book.genre}</td>
-                            <td>{book.averageRating.toFixed(1)}</td>
-                            <td>
-                                <button className="btn view" onClick={() => handleView(book._id)}>
-                                    View
-                                </button>
-                                <button className="btn edit" onClick={() => handleEdit(book._id)}>
-                                    Edit
-                                </button>
-                                <button className="btn delete" onClick={() => handleDelete(book._id)}>
-                                    Delete
-                                </button>
-                            </td>
+            ) : (
+                <table className="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Genre</th>
+                            <th>Average Rating</th>
+                            <th>Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-        }
-         {/* Modal for View/Edit */}
+                    </thead>
+                    <tbody>
+                        {books.map((book) => (
+                            <tr key={book._id}>
+                                <td>{book.title}</td>
+                                <td>{book.author}</td>
+                                <td>{book.genre}</td>
+                                <td>{book.averageRating?.toFixed(1) || 'N/A'}</td>
+                                <td>
+                                    <button className="btn view" onClick={() => handleView(book._id)}>
+                                        View
+                                    </button>
+                                    <button className="btn edit" onClick={() => handleBookSelect(book, true)}>
+                                        Edit
+                                    </button>
+                                    <button className="btn delete" onClick={() => handleDelete(book._id)}>
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+
+            {/* Modal for View/Edit */}
             {selectedBook && (
-                < className="modal">
+                <div className="modal">
                     <div className="modal-content">
                         <h2>{isEdit ? 'Edit Book' : 'View Book'}</h2>
                         <form onSubmit={isEdit ? handleEditSubmit : null}>
@@ -235,7 +273,8 @@ const fetchBooks = async () => {
                             Close
                         </button>
                     </div>
-            } 
+                </div>
+            )}
         </div>
     );
 };
