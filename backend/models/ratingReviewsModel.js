@@ -20,6 +20,7 @@ const ratingReviewModel = new mongoose.Schema({
     reviewText: {
         type: String,
         trim: true,
+        required: false, // Review text is optional
     },
     dateAdded: {
         type: Date,

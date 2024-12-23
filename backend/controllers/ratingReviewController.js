@@ -1,4 +1,4 @@
-const RatingReviews = require('../models/ratingReviewModel');
+const RatingReviews = require('../models/ratingReviewsModel');
 const Book = require('../models/bookModel');
 
 // Add a new rating and review

@@ -22,9 +22,14 @@ const bookModel = new mongoose.Schema(
             required: true,
         },
         coverImage: {
-            data: Buffer, // Stores the image as binary data
-            contentType: String, // Stores the MIME type of the image
-            required: true,
+            data: {
+                type: Buffer, // Stores the image as binary data
+                required: true, // This should be part of the field object
+            },
+            contentType: {
+                type: String, // Stores the MIME type of the image
+                required: true, // This should be part of the field object
+            },
         },
         RatingsAndReviews: [
             {

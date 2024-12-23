@@ -3,8 +3,9 @@ const Book = require('../models/bookModel');
 // Get all books
 const getAllBooks = async (req, res) => {
     try {
-        const books = await Book.find().populate('RatingsAndReviews');
-        res.status(200).json(books);
+        const books = await Book.find();
+        const populatedBooks = await Book.populate(books, { path: 'RatingsAndReviews' });
+        res.status(200).json(populatedBooks);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -30,8 +31,6 @@ const getBookById = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-
 
 // Add a new book with cover image
 const addBook = async (req, res) => {
