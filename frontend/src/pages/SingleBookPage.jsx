@@ -11,6 +11,31 @@ const SingleBookPage = () => {
   const [rating, setRating] = useState(5);
   const [reviewAuthor, setReviewAuthor] = useState('');
   const [reviewText, setReviewText] = useState('');
+  const [userName, setUserName] = useState('');
+  const [userId, setUserId] = useState('');
+    useEffect(() => {
+      // Fetching user profile
+      const fetchUserProfile = async () => {
+        try {
+          const token = localStorage.getItem('token'); // Use localStorage for web
+          if (token) {
+            const response = await fetch(`http://localhost:8081/users/getUser/${id}`, {
+              method: 'GET',
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            const data = await response.json();
+            setUserName(data.userName); // Set the user's name
+            setUserId(data._id);
+          }
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
+        }
+      };
+  
+      fetchUserProfile();
+    }, [id]);
 
   useEffect(() => {
     const fetchBookById = async () => {
@@ -35,27 +60,52 @@ const SingleBookPage = () => {
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
-    if (!reviewAuthor.trim() || !reviewText.trim() || rating < 1 || rating > 5) {
+
+    if (!reviewText.trim() || rating < 1 || rating > 5) {
       alert('Please provide valid input.');
       return;
     }
+
     try {
-      const reviewData = { bookId: id, rating, reviewText };
-      const response = await fetch('http://localhost:8081/addRatingReview/', {
+      const token = localStorage.getItem('token'); // Get token from localStorage
+      if (!token) {
+        alert('Please log in to submit a review.');
+        return;
+      }
+
+      const reviewData = {
+        bookId: id,
+        userId: userId,
+        rating: rating,
+        reviewText: reviewText,
+      };
+
+      // Sending the review data to the backend
+      const response = await fetch('http://localhost:8081/ratingReviews/addRatingReview', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          // Authorization: `Bearer ${token}`,  // Pass token in the Authorization header
+        },
         body: JSON.stringify(reviewData),
       });
-      if (!response.ok) throw new Error('Failed to submit review');
+
+      if (!response.ok) {
+        throw new Error('Failed to submit review');
+      }
+
       const savedReview = await response.json();
-      setReviews((prevReviews) => [...prevReviews, savedReview]);
-      setRating(5);
-      setReviewAuthor('');
-      setReviewText('');
+
+      // Update reviews state with the newly added review
+      setReviews((prevReviews) => [...prevReviews, savedReview.newRating]);
+      setRating(5);  // Reset rating
+      setReviewText('');  // Reset review text
+
     } catch (error) {
       console.error('Error posting review:', error);
     }
   };
+
 
   if (loading) return <h2>Loading book data...</h2>;
   if (error) return <h2 style={{ color: 'red' }}>Error: {error}</h2>;
@@ -94,13 +144,7 @@ const SingleBookPage = () => {
         <h1>Add a Review</h1>
         <form onSubmit={handleReviewSubmit} className="review-form">
           <label>
-            Name:
-            <input
-              type="text"
-              placeholder="Your name"
-              value={reviewAuthor}
-              onChange={(e) => setReviewAuthor(e.target.value)}
-            />
+            Name:${userName}
           </label>
           <label>
             Rating (1-5):

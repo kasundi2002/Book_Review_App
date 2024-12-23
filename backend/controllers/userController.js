@@ -10,6 +10,8 @@ const registerUser = async (req, res) => {
 
   const { name, email, password } = req.body;
 
+  console.log(`name:${name} , email:${email} password:${password}`);
+
   // Ensure all required fields are provided
   if (!name || !email || !password) {
     return res.status(400).json({ message: 'All fields are required: name, email, password' });
@@ -152,7 +154,8 @@ const deleteUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
-  console.log(`Inside login of userController:${email},${password}`)
+  console.log(`Inside login of userController:${email},${password}`);
+  
   try {
     // Check if the user exists
     const user = await User.findOne({ email });

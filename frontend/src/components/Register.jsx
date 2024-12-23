@@ -8,24 +8,56 @@ const Registration = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate(); 
 
-  const handleRegistration = (e) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      alert("Passwords don't match!");
+const handleRegistration = async (e) => {
+  console.log(`Inside register`)
+  e.preventDefault();
+
+  if (password !== confirmPassword) {
+    alert("Passwords don't match!");
+    return;
+  }
+
+  try {
+    // API call to register the user
+    const response = await fetch('http://localhost:8081/users/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      alert(`Registration failed: ${errorData.message || 'Unknown error'}`);
       return;
     }
-    // Handle registration logic here, e.g., call API to register
-    console.log('Registering with:', { name, email, password });
-  };
 
-    const handleLoginRedirect = () => {
+    const data = await response.json();
+    console.log(data);
+    alert('Registration successful! Please login.');
+
+    // Redirect to login page after successful registration
+    navigate('/login');
+  } catch (error) {
+    console.error('Error during registration:', error.message);
+    alert('Registration failed. Please try again.');
+  }
+};
+
+
+  const handleLoginRedirect = () => {
     navigate('/login'); // Navigate to the login page
   };
 
   return (
     <div style={styles.formContainer}>
       <h2 style={styles.heading}>Register</h2>
-      <form onSubmit={handleRegistration}>
+      <form>
         <div style={styles.formGroup}>
           <label style={styles.label}>Name</label>
           <input 
@@ -66,7 +98,7 @@ const Registration = () => {
             style={styles.input} 
           />
         </div>
-        <button type="submit" style={styles.button}>Register</button>
+        <button type="button" style={styles.button} onClick={handleRegistration}>Register</button>
 
         <button type="submit" style={styles.login} onClick={handleLoginRedirect}>Already have an account?</button>
       </form>
