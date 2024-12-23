@@ -1,7 +1,7 @@
 I have only used css to style this.
 
 I implemented the admin side to add , edit , delete and view books. becaue I misread the document.
-use this link : http://localhost:3000/adminHome
+use this link to view it: http://localhost:3000/adminHome
 
 I have implemented the customer side to view existing books rate and review them.
 http://localhost:3000/customerHome

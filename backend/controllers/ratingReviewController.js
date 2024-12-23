@@ -1,8 +1,8 @@
 const RatingReviews = require('../models/ratingReviewsModel');
 const Book = require('../models/bookModel');
 const calculateAndUpdateAverageRating = require('./../services/bookService');
-// Add a new rating and review
 
+// Add a new rating and review
 const addRatingReview = async (req, res) => {
     try {
         console.log('Request Body:', req.body);
@@ -40,7 +40,6 @@ const addRatingReview = async (req, res) => {
     }
 };
 
-
 // Get all reviews for a specific book
 const getReviewsByBook = async (req, res) => {
     try {
@@ -51,37 +50,43 @@ const getReviewsByBook = async (req, res) => {
     }
 };
 
+// Get all reviews by a specific user
+const getReviewsByUser = async (req, res) => {
+    try {
+        const reviews = await RatingReviews.find({ userId: req.params.userId }).populate('bookId', 'title author'); // Populate book details (optional)
+        if (reviews.length === 0) {
+            return res.status(404).json({ message: 'No reviews found for this user.' });
+        }
+        res.status(200).json(reviews);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Get a specific review by review ID
+const getReviewById = async (req, res) => {
+    try {
+        const review = await RatingReviews.findById(req.params.id).populate('bookId', 'title author');
+        if (!review) {
+            return res.status(404).json({ message: 'Review not found' });
+        }
+        res.status(200).json(review);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 // Delete a review
 const deleteReview = async (req, res) => {
     try {
-        const review = await RatingReviews.findById(req.params.id);
-        if (!review) return res.status(404).json({ message: 'Review not found' });
-
-        // Remove review ID from the associated book
-        const book = await Book.findById(review.bookId);
-        if (book) {
-            book.RatingsAndReviews = book.RatingsAndReviews.filter(
-                (id) => id.toString() !== review._id.toString()
-            );
-
-            // Recalculate average rating
-            if (book.RatingsAndReviews.length > 0) {
-                const allReviews = await RatingReviews.find({ bookId: book._id });
-                book.averageRating =
-                    allReviews.reduce((sum, r) => sum + r.rating, 0) / book.RatingsAndReviews.length;
-            } else {
-                book.averageRating = 0;
-            }
-
-            await book.save();
-        }
-
-        await review.remove();
+        const deletedReview = await RatingReviews.findByIdAndDelete(req.params.id);
+        if (!deletedReview) return res.status(404).json({ message: 'Review not found' });
         res.status(200).json({ message: 'Review deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+  
 
 // Update a review
 const updateReview = async (req, res) => {
@@ -120,5 +125,4 @@ const updateReview = async (req, res) => {
     }
 };
 
-
-module.exports = { addRatingReview, getReviewsByBook, deleteReview , updateReview};
+module.exports = { addRatingReview, getReviewsByBook, getReviewsByUser, getReviewById, deleteReview, updateReview };
