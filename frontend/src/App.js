@@ -5,6 +5,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import CustomerHomePage from './pages/CustomerHomePage';
 import SingleBookPage from './pages/SingleBookPage';
+import AdminViewBookPage from './pages/AdminViewBookPage';
 
 function App() {
   return (
@@ -19,7 +20,8 @@ function App() {
         
         {/* Admin route */}
         <Route path="/adminHome" element={<AdminHomePage />} />
-
+        <Route path="/adminViewBook/:id" element={<AdminViewBookPage />} />
+        
         {/* customer route */}
         <Route path="/books/:id" element={<SingleBookPage />} />
         <Route path="/customerHome" element={<CustomerHomePage />} />

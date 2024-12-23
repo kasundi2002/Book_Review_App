@@ -5,8 +5,6 @@ import { useNavigate } from 'react-router-dom';
 const AdminHomePage = () => {
     const [books, setBooks] = useState([]);
     const [showAddForm, setShowAddForm] = useState(false);
-    
-
     const [newBook, setNewBook] = useState({
         title: '',
         author: '',
@@ -19,7 +17,7 @@ const AdminHomePage = () => {
     const navigate = useNavigate();
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(5); // You can adjust this value
+    const [itemsPerPage] = useState(5); // You can adjust this value 
 
     // Fetch books from the API
     useEffect(() => {
@@ -69,7 +67,7 @@ const AdminHomePage = () => {
     // Handle View (navigate to view page)
     const handleView = (id) => {
         
-        navigate(`/book/${id}`); // Redirect to the book details page
+        navigate(`/adminViewBook/${id}`); // Redirect to the book details page
     };
 
     // Handle Add Book Form Submission
@@ -114,28 +112,35 @@ const AdminHomePage = () => {
 
     // Open the modal to view or edit the book
     const handleBookSelect = (book, edit = false) => {
+        console.log(`book in handleSelect:${book}`);
         setSelectedBook(book);
         setIsEdit(edit);
+        console.log(`selected book in handleSelect:${selectedBook}`);
+
     };
 
     // Handle the form submit for editing the selected book
     const handleEditSubmit = async (e) => {
         e.preventDefault();
-        const formData = new FormData();
-        formData.append('title', selectedBook.title);
-        formData.append('author', selectedBook.author);
-        formData.append('genre', selectedBook.genre);
-        formData.append('summary', selectedBook.summary);
-
-        if (selectedBook.coverImage && selectedBook.coverImage instanceof File) {
-            formData.append('coverImage', selectedBook.coverImage);
-        }
-
-        try {
-            const response = await fetch(`http://localhost:8081/book/updateBook/${selectedBook._id}`, {
-                method: 'PUT',
-                body: formData,
-            });
+        console.log(`selected book:${selectedBook.genre}`);
+        console.log(`selected book:${selectedBook.title}`);
+        console.log(`selected book:${selectedBook.author}`);
+        console.log(`selected book:${selectedBook._id}`);
+       
+        
+try {
+    const response = await fetch(`http://localhost:8081/book/updateBook/${selectedBook._id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            title: selectedBook.title,
+            author: selectedBook.author,
+            genre: selectedBook.genre,
+            summary: selectedBook.summary,
+        }),
+    });
 
             if (!response.ok) {
                 throw new Error('Failed to update book');
