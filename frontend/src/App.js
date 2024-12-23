@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import AdminHomePage from './pages/AdminHomePage';
 import Login from './components/Login';
 import Register from './components/Register';
+import CustomerHomePage from './pages/CustomerHomePage';
+import SingleBookPage from './pages/SingleBookPage';
 
 function App() {
   return (
@@ -17,6 +19,10 @@ function App() {
         
         {/* Admin route */}
         <Route path="/adminHome" element={<AdminHomePage />} />
+
+        {/* customer route */}
+        <Route path="/customerHome" element={<CustomerHomePage />} />
+        <Route path="/book/:id" element={<SingleBookPage />} />
       </Routes>
     </Router>
   );

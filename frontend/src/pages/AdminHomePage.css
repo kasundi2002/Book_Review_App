@@ -1,3 +1,4 @@
+/* Admin Home Page */
 .admin-home {
     padding: 20px;
     font-family: Arial, sans-serif;
@@ -25,7 +26,8 @@ h1 {
 
 /* Styles when form is visible */
 .add-book-form input,
-.add-book-form textarea {
+.add-book-form textarea,
+.add-book-form select {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
@@ -33,6 +35,18 @@ h1 {
     border-radius: 4px;
     font-size: 14px;
     box-sizing: border-box;
+}
+
+.add-book-form select {
+    -webkit-appearance: none;
+    /* Remove default dropdown styling */
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #fff;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><path fill="none" stroke="%23999" d="M1 4l4 4 4-4"></path></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px 10px;
 }
 
 .add-book-form textarea {
@@ -68,7 +82,7 @@ h1 {
     background-color: #5a6268;
 }
 
-/* Admin table styles */
+/* Admin Table Styles */
 .admin-table {
     width: 100%;
     border-collapse: collapse;
@@ -95,7 +109,7 @@ h1 {
     background-color: #f1f1f1;
 }
 
-/* Button styles */
+/* Button Styles */
 .btn {
     padding: 8px 12px;
     margin: 0 5px;
@@ -122,4 +136,163 @@ h1 {
 
 .btn:hover {
     opacity: 0.8;
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    /* Ensure it is on top */
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 600px;
+    transition: all 0.3s ease;
+}
+
+.modal h2 {
+    text-align: center;
+    color: #333;
+}
+
+.modal form input,
+.modal form textarea,
+.modal form select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.modal form select {
+    -webkit-appearance: none;
+    /* Remove default dropdown styling */
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #fff;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><path fill="none" stroke="%23999" d="M1 4l4 4 4-4"></path></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px 10px;
+}
+
+.modal form textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+.modal form input[type="file"] {
+    padding: 5px;
+}
+
+.modal .btn {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.modal .btn:hover {
+    background-color: #0056b3;
+}
+
+.modal .btn.save {
+    background-color: #28a745;
+}
+
+.modal .btn.save:hover {
+    background-color: #218838;
+}
+
+.modal .btn.close {
+    background-color: #dc3545;
+}
+
+.modal .btn.close:hover {
+    background-color: #c82333;
+}
+
+/* Close Modal Button */
+.modal .btn.close {
+    margin-top: 10px;
+    background-color: #6c757d;
+}
+
+.modal .btn.close:hover {
+    background-color: #5a6268;
+}
+
+/* Pagination Container */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+/* Pagination Button Styling */
+.pagination-btn {
+    padding: 10px 20px;
+    margin: 0 5px;
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-btn:hover {
+    background-color: #e1e1e1;
+}
+
+.pagination-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Page Number Display */
+.page-number {
+    font-size: 16px;
+    color: #333;
+    margin: 0 10px;
+}
+
+/* Responsive Pagination (For small screens) */
+@media (max-width: 600px) {
+    .pagination {
+        flex-direction: column;
+    }
+
+    .pagination-btn {
+        margin-bottom: 10px;
+    }
+
+    .page-number {
+        margin-bottom: 10px;
+    }
 }

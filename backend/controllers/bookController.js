@@ -63,6 +63,7 @@ const addBook = async (req, res) => {
 const updateBook = async (req, res) => {
     try {
         const { title, author, genre, summary } = req.body;
+        console.log(`Inside update book: ${title} , ${author} , ${genre} ${summary}`);
         const bookId = req.params.id;
 
         const book = await Book.findById(bookId);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './AdminHomePage.css';
+import { useNavigate } from 'react-router-dom';
 
 const AdminHomePage = () => {
     const [books, setBooks] = useState([]);
@@ -13,6 +14,10 @@ const AdminHomePage = () => {
     });
     const [selectedBook, setSelectedBook] = useState(null);
     const [isEdit, setIsEdit] = useState(false); // To toggle between View/Edit modes
+    const navigate = useNavigate();
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5); // You can adjust this value
 
     // Fetch books from the API
     useEffect(() => {
@@ -25,7 +30,6 @@ const AdminHomePage = () => {
                 }
 
                 const data = await response.json();
-
                 if (data && data.length > 0) {
                     setBooks(data);
                 } else {
@@ -62,7 +66,8 @@ const AdminHomePage = () => {
 
     // Handle View (navigate to view page)
     const handleView = (id) => {
-        window.location.href = `http://localhost:8081/book/getOnebook/${id}`; // Adjust the path as needed
+        
+        navigate(`/book/${id}`); // Redirect to the book details page
     };
 
     // Handle Add Book Form Submission
@@ -142,6 +147,24 @@ const AdminHomePage = () => {
         }
     };
 
+    // Pagination Logic
+    const totalPages = Math.ceil(books.length / itemsPerPage);
+    const currentBooks = books.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
+    const handleFirstPage = () => setCurrentPage(1);
+    const handleLastPage = () => setCurrentPage(totalPages);
+    const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+    const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+
     return (
         <div className="admin-home">
             <h1>Admin Home Page</h1>
@@ -165,13 +188,19 @@ const AdminHomePage = () => {
                         onChange={(e) => setNewBook({ ...newBook, author: e.target.value })}
                         required
                     />
-                    <input
-                        type="text"
-                        placeholder="Genre"
+                    <select
                         value={newBook.genre}
                         onChange={(e) => setNewBook({ ...newBook, genre: e.target.value })}
                         required
-                    />
+                    >
+                        <option value="">Select Genre</option>
+                        <option value="Fiction">Fiction</option>
+                        <option value="Non-Fiction">Non-Fiction</option>
+                        <option value="Mystery">Mystery</option>
+                        <option value="Fantasy">Fantasy</option>
+                        <option value="Science Fiction">Science Fiction</option>
+                        <option value="Romance">Romance</option>
+                    </select>
                     <textarea
                         placeholder="Summary"
                         value={newBook.summary}
@@ -187,7 +216,6 @@ const AdminHomePage = () => {
                 </form>
             )}
 
-            {/* Display "No books" if books data is empty or null */}
             {books === null || books.length === 0 ? (
                 <p>No books available</p>
             ) : (
@@ -202,7 +230,7 @@ const AdminHomePage = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {books.map((book) => (
+                        {currentBooks.map((book) => (
                             <tr key={book._id}>
                                 <td>{book.title}</td>
                                 <td>{book.author}</td>
@@ -225,6 +253,25 @@ const AdminHomePage = () => {
                 </table>
             )}
 
+            {/* Pagination Controls */}
+            <div className="pagination">
+                <button className="pagination-btn first" onClick={handleFirstPage}>
+                    First
+                </button>
+                <button className="pagination-btn prev" onClick={handlePrevPage}>
+                    Previous
+                </button>
+                <span className="page-number">
+                    Page {currentPage} of {totalPages}
+                </span>
+                <button className="pagination-btn next" onClick={handleNextPage}>
+                    Next
+                </button>
+                <button className="pagination-btn last" onClick={handleLastPage}>
+                    Last
+                </button>
+            </div>
+
             {/* Modal for View/Edit */}
             {selectedBook && (
                 <div className="modal">
@@ -245,13 +292,20 @@ const AdminHomePage = () => {
                                 disabled={!isEdit}
                                 required
                             />
-                            <input
-                                type="text"
+                            <select
                                 value={selectedBook.genre}
                                 onChange={(e) => setSelectedBook({ ...selectedBook, genre: e.target.value })}
-                                disabled={!isEdit}
+                                disabled={!isEdit} // Disable when not in edit mode
                                 required
-                            />
+                            >
+                                <option value="">Select Genre</option>
+                                <option value="Fiction">Fiction</option>
+                                <option value="Non-Fiction">Non-Fiction</option>
+                                <option value="Mystery">Mystery</option>
+                                <option value="Fantasy">Fantasy</option>
+                                <option value="Science Fiction">Science Fiction</option>
+                                <option value="Romance">Romance</option>
+                            </select>
                             <textarea
                                 value={selectedBook.summary}
                                 onChange={(e) => setSelectedBook({ ...selectedBook, summary: e.target.value })}

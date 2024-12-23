@@ -1,28 +1,32 @@
 const RatingReviews = require('../models/ratingReviewsModel');
 const Book = require('../models/bookModel');
-
+const calculateAndUpdateAverageRating = require('./../services/bookService');
 // Add a new rating and review
+
 const addRatingReview = async (req, res) => {
     try {
-        const { bookId, rating } = req.body;
+        const { bookId, userId, rating, reviewText } = req.body;
 
-        const review = new RatingReviews(req.body);
-        const savedReview = await review.save();
+        // Add a new rating
+        const newRating = await RatingReviews.create({
+            bookId,
+            userId,
+            rating,
+            reviewText,
+        });
 
-        // Update book's average rating
-        const book = await Book.findById(bookId);
-        if (book) {
-            book.RatingsAndReviews.push(savedReview._id);
-            book.averageRating =
-                (book.averageRating * (book.RatingsAndReviews.length - 1) + rating) /
-                book.RatingsAndReviews.length;
-            await book.save();
-        }
+        // Recalculate the average rating
+        const averageRating = await calculateAndUpdateAverageRating(bookId);
 
-        res.status(201).json(savedReview);
+        res.status(201).json({
+            message: 'Rating added successfully',
+            newRating,
+            averageRating,
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: 'Error adding rating', error });
     }
+
 };
 
 // Get all reviews for a specific book
