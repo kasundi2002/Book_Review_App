@@ -1,24 +1,22 @@
+.content {
+    padding: 20px;
+}
+
+/* Existing Product Grid Styles */
 .product-grid {
-    /* Use CSS Grid with 4 columns */
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 40px;
-    width: 100%;
-    /* Make it responsive */
     max-width: 1400px;
     margin: 0 auto;
-    /* Center the grid */
     padding: 40px;
-    box-sizing: border-box;
 }
 
 .product-card {
     background-color: #f2dca9;
-    border: 1px solid #eee;
     border-radius: 20px;
     text-align: center;
     padding: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -60,6 +58,7 @@
 
 .view-item-btn {
     margin-top: 10px;
+    margin-bottom: 10px;
     padding: 8px 16px;
     background-color: #1ffb3c;
     color: #fff;

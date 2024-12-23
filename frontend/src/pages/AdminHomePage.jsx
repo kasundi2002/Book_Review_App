@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './AdminHomePage.css';
+import './../css/AdminHomePage.css';
 import { useNavigate } from 'react-router-dom';
 
 const AdminHomePage = () => {
