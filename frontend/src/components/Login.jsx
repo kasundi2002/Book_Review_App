@@ -31,10 +31,10 @@ const Login = () => {
         // Navigate based on user type
         switch (user.userType) {
           case 'Customer':
-            navigate('/CustomerHomePage');
+            navigate('/customerHome');
             break;
           case 'Admin':
-            navigate('/AdminHomePage');
+            navigate('/adminHome');
             break;
           default:
             alert('Error: Invalid user type');
