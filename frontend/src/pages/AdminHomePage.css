@@ -1,0 +1,125 @@
+.admin-home {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Styling for the Add Book Form */
+.add-book-form {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    width: 100%;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    transition: all 0.3s ease;
+}
+
+/* Styles when form is visible */
+.add-book-form input,
+.add-book-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.add-book-form textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+.add-book-form input[type="file"] {
+    padding: 5px;
+}
+
+.add-book-form button {
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-book-form button:hover {
+    background-color: #218838;
+}
+
+.add-book-form .cancel-btn {
+    background-color: #6c757d;
+    margin-left: 10px;
+}
+
+.add-book-form .cancel-btn:hover {
+    background-color: #5a6268;
+}
+
+/* Admin table styles */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.admin-table th {
+    background-color: #f4f4f4;
+    color: #555;
+}
+
+.admin-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.admin-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Button styles */
+.btn {
+    padding: 8px 12px;
+    margin: 0 5px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn.view {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn.edit {
+    background-color: #ffc107;
+    color: black;
+}
+
+.btn.delete {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
