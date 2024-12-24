@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import '../css/SingleBookPage.css';
 import Navbar from './../components/Navbar';
 import Footer from './../components/Footer';
+import { useNavigate } from 'react-router-dom';
 
 const SingleBookPage = () => {
   const { id } = useParams();
@@ -17,6 +18,7 @@ const SingleBookPage = () => {
   const [editReviewId, setEditReviewId] = useState(null);
   const [editRating, setEditRating] = useState(5);
   const [editText, setEditText] = useState('');
+  const navigate = useNavigate(); 
 
   // Fetching user profile
   useEffect(() => {
@@ -228,7 +230,7 @@ const SingleBookPage = () => {
   return (
     <div>
     <Navbar userName={userName} />
-      <button type="button" onClick={`/customerHome`} 
+      <button type="button" onClick={() => navigate('/customerHome')} 
       style={{
       backgroundColor: 'black',
       color: 'white',
