@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import '../css/SingleBookPage.css';
+import Navbar from './../components/Navbar';
+import Footer from './../components/Footer';
 
 const SingleBookPage = () => {
   const { id } = useParams();
@@ -225,6 +227,19 @@ const SingleBookPage = () => {
 
   return (
     <div>
+    <Navbar userName={userName} />
+      <button type="button" onClick={`/customerHome`} 
+      style={{
+      backgroundColor: 'black',
+      color: 'white',
+      marginTop:'10px',
+      padding: '10px 20px',
+      fontSize: '16px',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+      width: '10%',
+    }}>Go back</button>
       <div className="item-detail-container">
         <img src={book.coverImage} alt={book.title} className="item-image" />
         <div className="item-details">
@@ -395,6 +410,7 @@ const SingleBookPage = () => {
           )}
 
       </div>
+       <Footer />
     </div>
   );
 };
