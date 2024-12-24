@@ -286,29 +286,114 @@ const SingleBookPage = () => {
         </form>
 
         {/* Edit review form */}
+
+        
         {editReviewId && (
-          <form onSubmit={handleEditSubmit}>
-            <label>
-              Rating (1-5):
-              <input
-                type="number"
-                min="1"
-                max="5"
-                value={editRating}
-                onChange={(e) => setEditRating(Number(e.target.value))}
-              />
-            </label>
-            <label>
-              Review:
-              <textarea
-                placeholder="Edit your review..."
-                value={editText}
-                onChange={(e) => setEditText(e.target.value)}
-              />
-            </label>
-            <button type="submit">Update Review</button>
-          </form>
-        )}
+            <div
+              className="edit-review-form"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '20px',
+                backgroundColor: '#f9f9f9',
+                borderRadius: '8px',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                width: '40%',
+                margin: '0 auto',
+              }}
+            >
+              <h2 style={{ marginBottom: '20px' }}>Edit Review</h2>
+              <form onSubmit={handleEditSubmit} style={{ width: '100%' }}>
+                <label
+                  style={{
+                    fontWeight: 'bold',
+                    fontSize: '16px',
+                    marginBottom: '10px',
+                    display: 'block',
+                  }}
+                >
+                  Rating (1-5):
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={editRating}
+                    onChange={(e) => setEditRating(Number(e.target.value))}
+                    style={{
+                      padding: '8px',
+                      fontSize: '16px',
+                      width: '60%',
+                      marginBottom: '15px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                      display: 'block',
+                    }}
+                  />
+                </label>
+                <label
+                  style={{
+                    fontWeight: 'bold',
+                    fontSize: '16px',
+                    marginBottom: '10px',
+                    display: 'block',
+                  }}
+                >
+                  Review:
+                  <textarea
+                    placeholder="Edit your review..."
+                    value={editText}
+                    onChange={(e) => setEditText(e.target.value)}
+                    style={{
+                      padding: '8px',
+                      fontSize: '16px',
+                      width: '60%',
+                      height: '100px',
+                      marginBottom: '15px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                      display: 'block',
+                    }}
+                  />
+                </label>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button
+                    type="submit"
+                    style={{
+                      backgroundColor: '#007BFF',
+                      color: 'white',
+                      padding: '10px 20px',
+                      fontSize: '16px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      width: '48%',
+                    }}
+                  >
+                    Update Review
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditReviewId(null)}
+                    style={{
+                      backgroundColor: 'red',
+                      color: 'white',
+                      padding: '10px 20px',
+                      fontSize: '16px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      width: '48%',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
       </div>
     </div>
   );
@@ -335,4 +420,5 @@ const editButtonStyle = {
   margin:'5px',
   fontSize: '14px',
 };
+
 export default SingleBookPage;
